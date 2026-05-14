@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /* 国风全局样式 */
-:root {
+::root {
   --color-gu-gong: #8b2c2c;
   --color-xuan-zhi: #f5f0e8;
   --color-mo-se: #2c2c2c;
@@ -18,7 +18,7 @@
 }
 
 body {
-  font-family: 'LXGW WenKai', serif;
+  font-family: 'LXGW WenKai', 'PingFang SC', 'Microsoft YaHei', serif;
   background: linear-gradient(180deg, #f5f0e8 0%, #e8dfd0 100%);
   min-height: 100vh;
   color: #2c2c2c;
@@ -26,14 +26,47 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Vant 组件主题覆盖 */
+:root {
+  --van-primary-color: #8b2c2c;
+  --van-button-primary-background: #8b2c2c;
+  --van-button-primary-border-color: #8b2c2c;
+  --van-tabbar-item-active-color: #8b2c2c;
+  --van-tag-primary-color: #8b2c2c;
+  --van-nav-bar-icon-color: #8b2c2c;
+  --van-nav-bar-text-color: #8b2c2c;
+  --van-dialog-confirm-button-text-color: #8b2c2c;
+  --van-notice-bar-font-size: 13px;
+}
+
+/* 卡片统一样式 */
+.van-dialog {
+  border-radius: 16px !important;
+  font-family: 'LXGW WenKai', serif;
+}
+
 /* 自定义滚动条 */
 ::-webkit-scrollbar {
   width: 4px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #d4af37;
   border-radius: 2px;
+}
+
+/* 选中文本颜色 */
+::selection {
+  background: rgba(139, 44, 44, 0.15);
+  color: #8b2c2c;
+}
+
+/* 图片禁止拖拽 */
+img {
+  -webkit-user-drag: none;
+  user-select: none;
 }

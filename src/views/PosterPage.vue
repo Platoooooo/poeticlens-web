@@ -3,10 +3,24 @@
     <!-- 顶部导航 -->
     <van-nav-bar left-text="返回" left-arrow @click-left="goBack" title="诗境海报" />
 
+    <!-- 模板切换 -->
+    <div class="template-switcher" v-if="analyzeStore.selectedPoem">
+      <button
+        v-for="t in templates"
+        :key="t.id"
+        class="template-btn"
+        :class="{ active: currentTemplate === t.id }"
+        @click="currentTemplate = t.id"
+      >
+        {{ t.name }}
+      </button>
+    </div>
+
     <!-- 海报预览 -->
     <div class="poster-preview" v-if="analyzeStore.selectedPoem">
-      <InkWash
-        ref="inkWashRef"
+      <component
+        :is="templateComponent"
+        :ref="setTemplateRef"
         :image="analyzeStore.imageBase64"
         :poem="analyzeStore.selectedPoem"
         :description="analyzeStore.analysisResult?.description"
@@ -30,31 +44,61 @@
       <van-button round block plain @click="handleCheckIn" class="mt-2">
         打卡
       </van-button>
+      <van-button round block plain @click="showMultiDynasty = true" class="mt-2">
+        🕰️ 跨时空对话
+      </van-button>
       <van-button round block plain @click="goBack" class="mt-2">
         返回首页
       </van-button>
     </div>
+
+    <!-- 跨时空对话弹窗 -->
+    <van-popup v-model:show="showMultiDynasty" position="right" :style="{ width: '100%', height: '100%' }">
+      <MultiDynasty @close="showMultiDynasty = false" />
+    </van-popup>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, shallowRef } from 'vue'
 import { useRouter } from 'vue-router'
-import { showToast } from 'vant'
+import { showToast, showDialog } from 'vant'
 import { useAnalyzeStore } from '../stores/analyze.js'
-import { setItem } from '../utils/storage.js'
+import { checkNewAchievements } from '../utils/achievement.js'
 import InkWash from '../components/PosterTemplate/InkWash.vue'
+import PalaceRed from '../components/PosterTemplate/PalaceRed.vue'
+import Minimal from '../components/PosterTemplate/Minimal.vue'
+import MultiDynasty from '../components/MultiDynasty.vue'
 import { exportPoster, savePoster, sharePoster } from '../utils/poster.js'
 
 const router = useRouter()
 const analyzeStore = useAnalyzeStore()
-const inkWashRef = ref(null)
 const saving = ref(false)
+const currentTemplate = ref('ink-wash')
+const showMultiDynasty = ref(false)
+const templateRefs = shallowRef({})
+
+const templates = [
+  { id: 'ink-wash', name: '水墨江南', component: InkWash },
+  { id: 'palace-red', name: '故宫红韵', component: PalaceRed },
+  { id: 'minimal', name: '极简留白', component: Minimal },
+]
+
+const templateComponent = computed(() => {
+  const t = templates.find((t) => t.id === currentTemplate.value)
+  return t ? t.component : InkWash
+})
+
+function setTemplateRef(el) {
+  if (el) {
+    templateRefs.value = el
+  }
+}
 
 async function handleSave() {
   saving.value = true
   try {
-    const el = inkWashRef.value?.posterRef?.$el || inkWashRef.value?.posterRef
+    const el = templateRefs.value?.posterRef?.$el || templateRefs.value?.posterRef || templateRefs.value?.$el
     if (!el) {
       showToast('海报元素未找到')
       return
@@ -72,7 +116,7 @@ async function handleSave() {
 
 async function handleShare() {
   try {
-    const el = inkWashRef.value?.posterRef?.$el || inkWashRef.value?.posterRef
+    const el = templateRefs.value?.posterRef?.$el || templateRefs.value?.posterRef || templateRefs.value?.$el
     if (!el) return
     const dataURL = await exportPoster(el)
     await sharePoster(dataURL)
@@ -82,7 +126,6 @@ async function handleShare() {
 }
 
 function handleCheckIn() {
-  // 获取位置（简化版）
   const record = {
     id: Date.now(),
     poem: analyzeStore.selectedPoem,
@@ -91,7 +134,6 @@ function handleCheckIn() {
     createTime: new Date().toISOString(),
   }
 
-  // 尝试获取位置
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
@@ -102,7 +144,6 @@ function handleCheckIn() {
         saveCheckIn(record)
       },
       () => {
-        // 定位失败也允许打卡
         saveCheckIn(record)
       },
       { timeout: 5000 }
@@ -117,6 +158,23 @@ function saveCheckIn(record) {
   checkins.unshift(record)
   localStorage.setItem('poeticlens_checkins', JSON.stringify(checkins))
   showToast('打卡成功！')
+
+  // 检查成就
+  const newAchievements = checkNewAchievements(checkins)
+  if (newAchievements.length > 0) {
+    setTimeout(() => {
+      showAchievementDialog(newAchievements[0])
+    }, 800)
+  }
+}
+
+function showAchievementDialog(achievement) {
+  showDialog({
+    title: '🎉 成就解锁',
+    message: `${achievement.icon} ${achievement.name}\n${achievement.desc}`,
+    confirmButtonText: '太棒了',
+    confirmButtonColor: '#8b2c2c',
+  })
 }
 
 function goBack() {
@@ -129,6 +187,30 @@ function goBack() {
   min-height: 100vh;
   background: linear-gradient(180deg, #f5f0e8 0%, #e8dfd0 100%);
   padding-bottom: 24px;
+}
+
+.template-switcher {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  justify-content: center;
+}
+
+.template-btn {
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1px solid #d4af37;
+  background: transparent;
+  color: #888;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.template-btn.active {
+  background: #8b2c2c;
+  color: #fff;
+  border-color: #8b2c2c;
 }
 
 .poster-preview {

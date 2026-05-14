@@ -19,8 +19,20 @@
         <p class="stat-label">遇见诗词</p>
       </div>
       <div class="stat-card">
-        <p class="stat-num">{{ achievements }}</p>
+        <p class="stat-num">{{ unlockedCount }}</p>
         <p class="stat-label">成就</p>
+      </div>
+    </div>
+
+    <!-- 成就展示 -->
+    <div class="achievement-section">
+      <h3 class="section-title">成就勋章</h3>
+      <div class="achievement-list">
+        <AchievementBadge
+          v-for="a in achievements"
+          :key="a.id"
+          :achievement="a"
+        />
       </div>
     </div>
 
@@ -49,11 +61,15 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { showToast } from 'vant'
+import AchievementBadge from '../components/AchievementBadge.vue'
+import { getAllAchievements } from '../utils/achievement.js'
 
 const checkins = ref([])
+const achievements = ref([])
 
 onMounted(() => {
   loadCheckins()
+  loadAchievements()
 })
 
 function loadCheckins() {
@@ -65,6 +81,10 @@ function loadCheckins() {
   }
 }
 
+function loadAchievements() {
+  achievements.value = getAllAchievements()
+}
+
 const checkinCount = computed(() => checkins.value.length)
 
 const uniquePoems = computed(() => {
@@ -72,9 +92,8 @@ const uniquePoems = computed(() => {
   return set.size
 })
 
-const achievements = computed(() => {
-  // 简单计算：打卡 1 次以上算有成就
-  return checkinCount.value > 0 ? 1 : 0
+const unlockedCount = computed(() => {
+  return achievements.value.filter((a) => a.unlocked).length
 })
 
 function deleteItem(id) {
@@ -151,10 +170,21 @@ function formatTime(iso) {
   margin-top: 4px;
 }
 
+.achievement-section {
+  margin-bottom: 16px;
+}
+
 .section-title {
   font-size: 16px;
   color: #8b2c2c;
   margin: 16px 16px 8px;
+}
+
+.achievement-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 16px;
 }
 
 .history-item {

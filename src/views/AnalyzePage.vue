@@ -3,13 +3,16 @@
     <!-- 返回按钮 -->
     <van-nav-bar left-text="返回" left-arrow @click-left="goBack" title="诗境识别" />
 
+    <!-- Demo 模式提示 -->
+    <van-notice-bar v-if="analyzeStore.isDemo" text="当前使用演示数据，请配置 API Key 以获得真实 AI 识别" left-icon="info-o" />
+
     <!-- 图片缩略图 -->
-    <div class="image-preview" v-if="analyzeStore.imageBase64">
+    <div class="image-preview animate-fade-in-up" v-if="analyzeStore.imageBase64">
       <img :src="analyzeStore.imageBase64" alt="拍摄图片" />
     </div>
 
     <!-- 场景信息卡片 -->
-    <div class="scene-card" v-if="analyzeStore.analysisResult">
+    <div class="scene-card animate-fade-in-up" v-if="analyzeStore.analysisResult" style="animation-delay: 0.1s">
       <h3 class="card-title">场景识别</h3>
       <p class="scene-desc">{{ analyzeStore.analysisResult.description }}</p>
       <div class="tag-group">
@@ -29,18 +32,23 @@
     <!-- 匹配诗词列表 -->
     <div class="poem-list" v-if="analyzeStore.matchedPoems.length">
       <h3 class="section-title">为你觅得 {{ analyzeStore.matchedPoems.length }} 首诗</h3>
-      <PoemCard
+      <div
         v-for="(poem, index) in analyzeStore.matchedPoems"
         :key="poem.id"
-        :poem="poem"
-        :rank="index + 1"
-        :selected="analyzeStore.selectedPoem?.id === poem.id"
-        @select="onSelectPoem"
-      />
+        class="card-enter"
+        :style="{ animationDelay: `${0.15 + index * 0.08}s` }"
+      >
+        <PoemCard
+          :poem="poem"
+          :rank="index + 1"
+          :selected="analyzeStore.selectedPoem?.id === poem.id"
+          @select="onSelectPoem"
+        />
+      </div>
     </div>
 
     <!-- 错误提示 -->
-    <div class="error-hint" v-if="analyzeStore.error">
+    <div class="error-hint" v-if="analyzeStore.error && !analyzeStore.isDemo">
       <van-notice-bar :text="analyzeStore.error" type="warning" />
     </div>
 
@@ -108,6 +116,7 @@ function goBack() {
   max-height: 200px;
   border-radius: 8px;
   object-fit: contain;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
 .scene-card {
@@ -115,6 +124,7 @@ function goBack() {
   padding: 16px;
   background: rgba(255, 255, 255, 0.7);
   border-radius: 12px;
+  border: 1px solid rgba(212, 175, 55, 0.1);
 }
 
 .card-title {
@@ -160,5 +170,9 @@ function goBack() {
 
 .mt-3 {
   margin-top: 8px;
+}
+
+.error-hint {
+  margin: 12px 16px;
 }
 </style>

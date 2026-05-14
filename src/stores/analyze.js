@@ -2,7 +2,9 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { analyzeImage } from '../api/index.js'
 import { matchPoems } from '../utils/match.js'
+import { checkNewAchievements } from '../utils/achievement.js'
 import poetryData from '../assets/data/poetry.json'
+import demoData from '../assets/data/demo.json'
 
 export const useAnalyzeStore = defineStore('analyze', () => {
   const imageBase64 = ref('')
@@ -11,6 +13,7 @@ export const useAnalyzeStore = defineStore('analyze', () => {
   const selectedPoem = ref(null)
   const loading = ref(false)
   const error = ref('')
+  const isDemo = ref(false)
 
   /**
    * 拍照后执行：AI 识别 + 匹配诗词
@@ -19,6 +22,7 @@ export const useAnalyzeStore = defineStore('analyze', () => {
     loading.value = true
     error.value = ''
     imageBase64.value = base64
+    isDemo.value = false
 
     try {
       // 1. 调用 AI 识别
@@ -40,15 +44,11 @@ export const useAnalyzeStore = defineStore('analyze', () => {
       error.value = err.message || 'AI 识别失败，请重试'
 
       // 降级：使用 demo 数据
-      analysisResult.value = {
-        season: '秋',
-        time: '昏',
-        objects: ['山', '枫叶'],
-        mood: ['幽静'],
-        keywords: ['秋色', '山林'],
-        description: '秋日山林，枫叶如火',
-      }
-      matchedPoems.value = matchPoems(analysisResult.value, poetryData)
+      isDemo.value = true
+      const demoIdx = Math.floor(Math.random() * demoData.length)
+      const demo = demoData[demoIdx]
+      analysisResult.value = demo.analysis
+      matchedPoems.value = demo.matchedPoems
       if (matchedPoems.value.length > 0) {
         selectedPoem.value = matchedPoems.value[0]
       }
@@ -67,6 +67,7 @@ export const useAnalyzeStore = defineStore('analyze', () => {
     matchedPoems.value = []
     selectedPoem.value = null
     error.value = ''
+    isDemo.value = false
   }
 
   return {
@@ -76,6 +77,7 @@ export const useAnalyzeStore = defineStore('analyze', () => {
     selectedPoem,
     loading,
     error,
+    isDemo,
     analyzeAndMatch,
     selectPoem,
     reset,

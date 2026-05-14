@@ -1,0 +1,127 @@
+[
+  {
+    "id": "demo_autumn_mountain",
+    "description": "秋日山林，枫叶如火",
+    "analysis": {
+      "season": "秋",
+      "time": "昏",
+      "objects": ["山", "枫叶", "云"],
+      "mood": ["幽静"],
+      "keywords": ["秋色", "山林"],
+      "description": "秋日山林，枫叶如火"
+    },
+    "matchedPoems": [
+      {
+        "id": 1,
+        "title": "山行",
+        "author": "杜牧",
+        "dynasty": "唐",
+        "content": "远上寒山石径斜，白云生处有人家。停车坐爱枫林晚，霜叶红于二月花。",
+        "best_line": "霜叶红于二月花",
+        "tags": ["秋", "山", "枫叶", "幽静", "昏", "云", "石", "山景"],
+        "scene": "山景",
+        "score": 5
+      }
+    ]
+  },
+  {
+    "id": "demo_spring_river",
+    "description": "春日江畔，垂柳依依",
+    "analysis": {
+      "season": "春",
+      "time": "晨",
+      "objects": ["江", "柳", "花"],
+      "mood": ["闲适"],
+      "keywords": ["春色", "江畔"],
+      "description": "春日江畔，垂柳依依"
+    },
+    "matchedPoems": [
+      {
+        "id": 2,
+        "title": "咏柳",
+        "author": "贺知章",
+        "dynasty": "唐",
+        "content": "碧玉妆成一树高，万条垂下绿丝绦。不知细叶谁裁出，二月春风似剪刀。",
+        "best_line": "二月春风似剪刀",
+        "tags": ["春", "柳", "闲适", "晨", "风", "水景"],
+        "scene": "水景",
+        "score": 4
+      }
+    ]
+  },
+  {
+    "id": "demo_night_moon",
+    "description": "月夜静思，银光如水",
+    "analysis": {
+      "season": "秋",
+      "time": "夜",
+      "objects": ["月", "云", "风"],
+      "mood": ["空灵"],
+      "keywords": ["月夜", "静思"],
+      "description": "月夜静思，银光如水"
+    },
+    "matchedPoems": [
+      {
+        "id": 3,
+        "title": "静夜思",
+        "author": "李白",
+        "dynasty": "唐",
+        "content": "床前明月光，疑是地上霜。举头望明月，低头思故乡。",
+        "best_line": "举头望明月",
+        "tags": ["月", "夜", "思乡", "秋", "空灵", "云"],
+        "scene": "月夜",
+        "score": 4
+      }
+    ]
+  },
+  {
+    "id": "demo_winter_snow",
+    "description": "冬日雪景，天地苍茫",
+    "analysis": {
+      "season": "冬",
+      "time": "昏",
+      "objects": ["雪", "山", "松"],
+      "mood": ["苍凉"],
+      "keywords": ["雪景", "寒冬"],
+      "description": "冬日雪景，天地苍茫"
+    },
+    "matchedPoems": [
+      {
+        "id": 5,
+        "title": "江雪",
+        "author": "柳宗元",
+        "dynasty": "唐",
+        "content": "千山鸟飞绝，万径人踪灭。孤舟蓑笠翁，独钓寒江雪。",
+        "best_line": "独钓寒江雪",
+        "tags": ["冬", "雪", "山", "苍凉", "江", "舟", "鸟"],
+        "scene": "雪景",
+        "score": 5
+      }
+    ]
+  },
+  {
+    "id": "demo_summer_lotus",
+    "description": "夏日荷塘，莲叶田田",
+    "analysis": {
+      "season": "夏",
+      "time": "午",
+      "objects": ["荷", "水", "风"],
+      "mood": ["恬淡"],
+      "keywords": ["荷塘", "夏景"],
+      "description": "夏日荷塘，莲叶田田"
+    },
+    "matchedPoems": [
+      {
+        "id": 10,
+        "title": "晓出净慈寺送林子方",
+        "author": "杨万里",
+        "dynasty": "宋",
+        "content": "毕竟西湖六月中，风光不与四时同。接天莲叶无穷碧，映日荷花别样红。",
+        "best_line": "映日荷花别样红",
+        "tags": ["夏", "荷", "水", "恬淡", "日", "湖"],
+        "scene": "荷塘",
+        "score": 4
+      }
+    ]
+  }
+]
