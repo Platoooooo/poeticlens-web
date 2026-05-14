@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 国风全局样式 */
+:root {
+  --color-gu-gong: #8b2c2c;
+  --color-xuan-zhi: #f5f0e8;
+  --color-mo-se: #2c2c2c;
+  --color-yin-zhu: #d4af37;
+  --color-feng-ye: #a83c3c;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'LXGW WenKai', serif;
+  background: linear-gradient(180deg, #f5f0e8 0%, #e8dfd0 100%);
+  min-height: 100vh;
+  color: #2c2c2c;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d4af37;
+  border-radius: 2px;
+}
