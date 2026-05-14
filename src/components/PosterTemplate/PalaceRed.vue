@@ -11,7 +11,7 @@
 
     <!-- 用户图片 -->
     <div class="photo-area">
-      <img :src="image" alt="" />
+      <img :src="image" alt="" @load="onImageLoad" />
     </div>
 
     <!-- 诗句区域 -->
@@ -48,17 +48,22 @@ const dateStr = computed(() => {
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
 })
 
+function onImageLoad(e) {
+  // 图片加载完成后无需额外处理，CSS 自动按原比例展示
+}
+
 defineExpose({ posterRef })
 </script>
 
 <style scoped>
 .poster-palace-red {
   width: 375px;
-  height: 667px;
   position: relative;
   overflow: hidden;
   background: #8b0000;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .palace-bg {
@@ -72,6 +77,7 @@ defineExpose({ posterRef })
   width: 60px;
   height: 60px;
   opacity: 0.15;
+  z-index: 1;
 }
 
 .cloud-ornament::before,
@@ -98,34 +104,32 @@ defineExpose({ posterRef })
 
 .top-left { top: 10px; left: 10px; }
 .top-right { top: 10px; right: 10px; transform: scaleX(-1); }
-.bottom-left { bottom: 80px; left: 10px; transform: scaleY(-1); }
-.bottom-right { bottom: 80px; right: 10px; transform: scale(-1); }
+.bottom-left { bottom: 10px; left: 10px; transform: scaleY(-1); }
+.bottom-right { bottom: 10px; right: 10px; transform: scale(-1); }
 
 .photo-area {
-  position: absolute;
-  top: 40px;
-  left: 50%;
-  transform: translateX(-50%);
+  position: relative;
   width: 295px;
-  height: 320px;
+  margin: 40px auto 0;
   border: 3px solid #d4af37;
   border-radius: 4px;
   overflow: hidden;
+  flex-shrink: 0;
+  z-index: 1;
 }
 
 .photo-area img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  display: block;
 }
 
 .poem-section {
-  position: absolute;
-  bottom: 100px;
-  left: 0;
-  right: 0;
+  position: relative;
   text-align: center;
-  padding: 0 24px;
+  padding: 24px 24px 0;
+  z-index: 1;
+  flex-shrink: 0;
 }
 
 .poem-title {
@@ -157,11 +161,11 @@ defineExpose({ posterRef })
 }
 
 .poster-brand {
-  position: absolute;
-  bottom: 16px;
-  left: 0;
-  right: 0;
+  position: relative;
+  padding: 16px 0;
   text-align: center;
+  z-index: 1;
+  flex-shrink: 0;
 }
 
 .poster-brand p {

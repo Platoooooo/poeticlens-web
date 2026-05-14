@@ -6,3 +6,9 @@
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
+
+# SPA fallback: 所有非静态资源请求返回 index.html，由前端路由处理
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

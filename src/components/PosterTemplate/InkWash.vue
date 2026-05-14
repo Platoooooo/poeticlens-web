@@ -1,8 +1,8 @@
 <template>
   <div class="poster-ink-wash" ref="posterRef">
-    <!-- 背景图 -->
-    <div class="poster-bg">
-      <img :src="image" alt="" />
+    <!-- 图片区域 -->
+    <div class="poster-image-area">
+      <img :src="image" alt="" @load="onImageLoad" />
       <div class="poster-overlay"></div>
     </div>
 
@@ -50,28 +50,34 @@ const dateStr = computed(() => {
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
 })
 
+function onImageLoad(e) {
+  // 图片加载完成后无需额外处理，CSS 自动按原比例展示
+}
+
 defineExpose({ posterRef })
 </script>
 
 <style scoped>
 .poster-ink-wash {
   width: 375px;
-  height: 667px;
   position: relative;
   overflow: hidden;
   background: #f5f0e8;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
 }
 
-.poster-bg {
-  position: absolute;
-  inset: 0;
-}
-
-.poster-bg img {
+.poster-image-area {
+  position: relative;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.poster-image-area img {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 .poster-overlay {
@@ -94,6 +100,7 @@ defineExpose({ posterRef })
   font-family: 'LXGW WenKai', serif;
   text-shadow: 0 0 8px rgba(245, 240, 232, 0.8);
   line-height: 1.5;
+  z-index: 2;
 }
 
 .poem-line {
@@ -101,16 +108,13 @@ defineExpose({ posterRef })
 }
 
 .poster-footer {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
   padding: 16px 20px;
   background: rgba(245, 240, 232, 0.85);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-shrink: 0;
 }
 
 .seal {

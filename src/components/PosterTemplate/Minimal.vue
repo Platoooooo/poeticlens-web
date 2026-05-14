@@ -5,7 +5,7 @@
 
     <!-- 用户图片 -->
     <div class="photo-area">
-      <img :src="image" alt="" />
+      <img :src="image" alt="" @load="onImageLoad" />
     </div>
 
     <!-- 几何分割线 -->
@@ -44,17 +44,22 @@ const dateStr = computed(() => {
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
 })
 
+function onImageLoad(e) {
+  // 图片加载完成后无需额外处理，CSS 自动按原比例展示
+}
+
 defineExpose({ posterRef })
 </script>
 
 <style scoped>
 .poster-minimal {
   width: 375px;
-  height: 667px;
   position: relative;
   overflow: hidden;
   background: #ffffff;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .minimal-bg {
@@ -64,36 +69,33 @@ defineExpose({ posterRef })
 }
 
 .photo-area {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 400px;
-  overflow: hidden;
+  position: relative;
+  width: 100%;
+  flex-shrink: 0;
+  z-index: 1;
 }
 
 .photo-area img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  display: block;
   filter: grayscale(30%);
 }
 
 .geo-line {
-  position: absolute;
-  top: 396px;
-  left: 32px;
-  right: 32px;
+  position: relative;
+  margin: 16px 32px;
   height: 1px;
   background: #000;
   opacity: 0.15;
+  z-index: 1;
 }
 
 .poem-section {
-  position: absolute;
-  top: 416px;
-  left: 32px;
-  right: 32px;
+  position: relative;
+  padding: 0 32px;
+  z-index: 1;
+  flex-shrink: 0;
 }
 
 .poem-best-line {
@@ -112,11 +114,12 @@ defineExpose({ posterRef })
 }
 
 .poster-brand {
-  position: absolute;
-  bottom: 20px;
-  left: 32px;
-  right: 32px;
+  position: relative;
+  padding: 20px 32px;
   text-align: center;
+  z-index: 1;
+  flex-shrink: 0;
+  margin-top: auto;
 }
 
 .brand-line {
