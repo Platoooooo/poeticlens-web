@@ -22,6 +22,7 @@
       <div class="brand-line"></div>
       <p>诗境 · PoeticLens</p>
       <p class="date-text">{{ dateStr }}</p>
+      <p class="location-text" v-if="location">📍 {{ location }}</p>
     </div>
   </div>
 </template>
@@ -34,6 +35,7 @@ const props = defineProps({
   poem: { type: Object, required: true },
   description: { type: String, default: '' },
   date: { type: String, default: '' },
+  location: { type: String, default: '' },
 })
 
 const posterRef = ref(null)
@@ -138,5 +140,11 @@ defineExpose({ posterRef })
 
 .date-text {
   margin-top: 2px;
+}
+
+.location-text {
+  margin-top: 2px;
+  font-size: 10px;
+  color: #ccc;
 }
 </style>

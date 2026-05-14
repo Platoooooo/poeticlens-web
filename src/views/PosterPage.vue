@@ -24,6 +24,7 @@
         :image="analyzeStore.imageBase64"
         :poem="analyzeStore.selectedPoem"
         :description="analyzeStore.analysisResult?.description"
+        :location="showLocation ? locationName : ''"
       />
     </div>
 
@@ -33,10 +34,17 @@
       <van-button type="primary" round @click="goBack">去拍照</van-button>
     </div>
 
+    <!-- 显示地点开关 -->
+    <div class="location-toggle" v-if="analyzeStore.selectedPoem">
+      <span class="toggle-label">{{ locationLoading ? '定位中...' : '显示地点' }}</span>
+      <van-switch v-model="showLocation" size="20px" @change="onLocationToggle" :disabled="locationLoading" />
+      <span class="location-name" v-if="showLocation && locationName">{{ locationName }}</span>
+    </div>
+
     <!-- 操作按钮 -->
     <div class="action-bar" v-if="analyzeStore.selectedPoem">
       <van-button round block type="primary" @click="handleSave" :loading="saving">
-        保存到相册
+        {{ isMobile ? '保存/分享' : '保存到相册' }}
       </van-button>
       <van-button round block plain @click="handleShare" class="mt-2">
         分享
@@ -77,6 +85,11 @@ const saving = ref(false)
 const currentTemplate = ref('ink-wash')
 const showMultiDynasty = ref(false)
 const templateRefs = shallowRef({})
+const showLocation = ref(true)
+const locationName = ref('')
+const locationLoading = ref(false)
+
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
 const templates = [
   { id: 'ink-wash', name: '水墨江南', component: InkWash },
@@ -104,7 +117,7 @@ async function handleSave() {
       return
     }
     const dataURL = await exportPoster(el)
-    savePoster(dataURL)
+    await savePoster(dataURL)
     showToast('海报已生成，请保存')
   } catch (err) {
     console.error('导出失败', err)
@@ -180,6 +193,88 @@ function showAchievementDialog(achievement) {
 function goBack() {
   router.push('/')
 }
+
+async function onLocationToggle(val) {
+  if (val && !locationName.value) {
+    await getLocationName()
+  }
+}
+
+async function getLocationName() {
+  if (locationName.value) return
+
+  if (!navigator.geolocation) {
+    showLocation.value = false
+    showToast('浏览器不支持定位')
+    return
+  }
+
+  locationLoading.value = true
+  try {
+    const pos = await new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000 })
+    })
+    const { latitude: lat, longitude: lng } = pos.coords
+    await reverseGeocode(lat, lng)
+  } catch {
+    showLocation.value = false
+    showToast('定位失败，已关闭地点显示')
+  } finally {
+    locationLoading.value = false
+  }
+}
+
+async function reverseGeocode(lat, lng) {
+  // 确保高德地图脚本已加载
+  await loadAMapScript()
+  await new Promise((resolve) => {
+    if (window.AMap) return resolve()
+    const check = setInterval(() => {
+      if (window.AMap) { clearInterval(check); resolve() }
+    }, 100)
+  })
+
+  return new Promise((resolve, reject) => {
+    window.AMap.plugin('AMap.Geocoder', () => {
+      const geocoder = new window.AMap.Geocoder()
+      geocoder.getAddress([lng, lat], (status, result) => {
+        if (status === 'complete' && result.regeocode) {
+          const { province, city, district } = result.regeocode.addressComponent
+          // 格式化：直辖市显示"城市·区县"，其他显示"省份·城市"
+          const isDirectCity = ['北京', '天津', '上海', '重庆'].some(c => province.includes(c))
+          if (isDirectCity) {
+            locationName.value = city ? `${city}·${district}` : province
+          } else {
+            locationName.value = city ? `${province.replace(/省$/, '')}·${city.replace(/市$/, '')}` : province
+          }
+          resolve()
+        } else {
+          reject(new Error('逆地理编码失败'))
+        }
+      })
+    })
+  })
+}
+
+function loadAMapScript() {
+  return new Promise((resolve) => {
+    if (window.AMap) return resolve()
+    const existing = document.querySelector('script[src*="webapi.amap.com"]')
+    if (existing) return resolve()
+    const key = import.meta.env.VITE_AMAP_KEY
+    if (!key) { resolve(); return }
+    const script = document.createElement('script')
+    script.src = `https://webapi.amap.com/maps?v=2.0&key=${key}&plugin=AMap.Geocoder`
+    script.onload = resolve
+    script.onerror = resolve
+    document.head.appendChild(script)
+  })
+}
+
+// 页面加载时自动获取地点
+if (showLocation.value) {
+  getLocationName()
+}
 </script>
 
 <style scoped>
@@ -237,5 +332,26 @@ function goBack() {
 
 .mt-2 {
   margin-top: 8px;
+}
+
+.location-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+}
+
+.toggle-label {
+  font-size: 13px;
+  color: #888;
+}
+
+.location-name {
+  font-size: 12px;
+  color: #8b2c2c;
+  background: rgba(139, 44, 44, 0.08);
+  padding: 2px 8px;
+  border-radius: 10px;
 }
 </style>
